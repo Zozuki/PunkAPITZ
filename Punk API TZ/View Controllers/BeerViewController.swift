@@ -56,22 +56,18 @@ class BeerViewController: UITableViewController, UINavigationControllerDelegate 
     }
     
     func loadMoreData() {
-            if !self.isLoading {
-                self.isLoading = true
-                DispatchQueue.global().async { [weak self] in
-                    self?.page += 1
-                    guard let guardPage = self?.page else { return }
-                    DispatchQueue.main.async {
-                        self?.service.getBeersList(page: guardPage) { elementsBeer in
-                            self?.fillBeersArr(elemsBeer: elementsBeer)
-                            self?.tableView.reloadData()
-                            self?.isLoading = false
-                        }
-                    }
-                    
+        if !self.isLoading {
+            self.isLoading = true
+            self.page += 1
+            self.service.getBeersList(page:  self.page) { elementsBeer in
+                DispatchQueue.global(qos: .utility).async {
+                    self.fillBeersArr(elemsBeer: elementsBeer)
                 }
+                self.tableView.reloadData()
+                self.isLoading = false
             }
         }
+    }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 0 {
